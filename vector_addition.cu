@@ -46,7 +46,7 @@ void add_vectors_dev(int *result, int *a, int *b, int n) {
 
      // Step 3: Invoke the kernel
      // We allocate enough blocks (each 512 threads long) in the grid to
-     // accomodate all `n` elements in the vectors. The 512 long block size
+     // accommodate all `n` elements in the vectors. The 512 long block size
      // is somewhat arbitrary, but with the constraint that we know the
      // hardware will support blocks of that size.
      dim3 dimGrid((n + 512 - 1) / 512, 1, 1);
@@ -70,7 +70,7 @@ void add_vectors_dev(int *result, int *a, int *b, int n) {
 }
 
 int main(void) {
-     const int CONST_VEC = INT_MAX;
+     const int CONST_VEC = INT_MAX / 5;
      // It looks like the crossover is just above this. At 2.6e8, GPU calculation time cuts in half (roughly).
 
      int* a = (int *)malloc(CONST_VEC * sizeof(int));
@@ -86,14 +86,14 @@ int main(void) {
 	     b[i] = (rand()%100)+1;  
      }
      ar = clock() - ar;
-     printf ("It took me %d clicks (%f seconds).\n",ar,((float)ar)/CLOCKS_PER_SEC);
+     printf ("It took me %ld clicks (%f seconds).\n",ar,((float)ar)/CLOCKS_PER_SEC);
 	
      printf("The CPU's answer: ");
      clock_t t = clock();
      add_vectors_host(host_result, a, b, CONST_VEC);
      t = clock() - t;
      //print_vector(host_result, CONST_VEC);
-     printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
+     printf ("It took me %ld clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
     
 
      printf("The GPU's answer: ");
@@ -101,7 +101,7 @@ int main(void) {
      add_vectors_dev(device_result, a, b, CONST_VEC);
      t2 = clock() - t2;
      //print_vector(device_result, CONST_VEC);
-     printf ("It took me %d clicks (%f seconds).\n",t2,((float)t2)/CLOCKS_PER_SEC);
+     printf ("It took me %ld clicks (%f seconds).\n",t2,((float)t2)/CLOCKS_PER_SEC);
 	
      return 0;
 }

@@ -8,13 +8,14 @@
 #include <string.h> // for memcpy
 #include <stdio.h> // for printf
 #include <time.h> // for nanosleep
+#include<curand.h>
 
 #define WIDTH 60
 #define HEIGHT 30
 
 // The two boards 
-__global__ int current[WIDTH * HEIGHT];
-__global__ int next[WIDTH * HEIGHT];
+int current[WIDTH * HEIGHT];
+int next[WIDTH * HEIGHT];
 
 
 const int offsets[8][2] = {{-1, 1},{0, 1},{1, 1},
@@ -28,21 +29,22 @@ void fill_board(int *board) {
         board[i] = rand() % 2;
 }
 
-__global__ void fill_board_kernel(int *board) {
+__global__ void fill_board_kernel(int *board, int current, int someNum) {
      int idx = blockDim.x * blockIdx.x + threadIdx.x;
-     if (idx < currentInt) {
-          board[idx] = rand() % 2;
+     if (idx < current) {
+          board[idx] = someNum % 2;
      }
 }
 
-void fill_board_dev(int *board) {
-     int *board_dev;
-     cudaMalloc((void **) &board_dev, sizeof(int) * current);
-     cudaMemcpy(current, sizeof(int) * current, cudaMemcptHostToDevice);
-     dim3 dimGrid((n + 512 - 1) / 512, 1, 1);
+void fill_board_dev(int *board, int currentVal) {
+     int *board_dev, *current_dev;
+     cudaMalloc((void **) &board_dev, sizeof(int) * currentVal);
+     cudaMalloc((void **) &current_dev, sizeof(int));
+     cudaMemcpy(current_dev, &currentVal, sizeof(int), cudaMemcpyHostToDevice);
+     dim3 dimGrid((currentVal + 512 - 1) / 512, 1, 1);
      dim3 dimBlock(512, 1, 1);
-     fill_board_kernel<<<dibGrid, dimBlock>>>(board_dev);
-     cudaMemcpy(board, board_dev, sizeof(int) * current, cudaMemcpyDeviceToHost);
+     fill_board_kernel<<<dimGrid, dimBlock>>>(board_dev, currentVal, rand());
+     cudaMemcpy(board, board_dev, sizeof(int) * currentVal, cudaMemcpyDeviceToHost);
      cudaFree(board_dev);
 }
 
@@ -108,6 +110,7 @@ void animate() {
 int main(void) {
     // Initialize the global "current".
     fill_board(current);
+    //fill_board_dev(current, *current);
     animate();
 
     return 0;

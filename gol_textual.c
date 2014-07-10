@@ -13,8 +13,9 @@
 #define HEIGHT 30
 
 // The two boards 
-int current[WIDTH * HEIGHT];
-int next[WIDTH * HEIGHT];
+__global__ int current[WIDTH * HEIGHT];
+__global__ int next[WIDTH * HEIGHT];
+
 
 const int offsets[8][2] = {{-1, 1},{0, 1},{1, 1},
                            {-1, 0},       {1, 0},
@@ -25,6 +26,24 @@ void fill_board(int *board) {
     int i;
     for (i=0; i<WIDTH*HEIGHT; i++)
         board[i] = rand() % 2;
+}
+
+__global__ void fill_board_kernel(int *board) {
+     int idx = blockDim.x * blockIdx.x + threadIdx.x;
+     if (idx < currentInt) {
+          board[idx] = rand() % 2;
+     }
+}
+
+void fill_board_dev(int *board) {
+     int *board_dev;
+     cudaMalloc((void **) &board_dev, sizeof(int) * current);
+     cudaMemcpy(current, sizeof(int) * current, cudaMemcptHostToDevice);
+     dim3 dimGrid((n + 512 - 1) / 512, 1, 1);
+     dim3 dimBlock(512, 1, 1);
+     fill_board_kernel<<<dibGrid, dimBlock>>>(board_dev);
+     cudaMemcpy(board, board_dev, sizeof(int) * current, cudaMemcpyDeviceToHost);
+     cudaFree(board_dev);
 }
 
 void print_board(int *board) {

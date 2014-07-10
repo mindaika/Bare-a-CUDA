@@ -8,7 +8,7 @@
 #include <string.h> // for memcpy
 #include <stdio.h> // for printf
 #include <time.h> // for nanosleep
-#include <curand.h>
+#include<curand.h>
 
 #define WIDTH 60
 #define HEIGHT 30

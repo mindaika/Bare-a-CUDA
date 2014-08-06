@@ -20,16 +20,16 @@ void CPU_mult(int *result, int *a, int *b, int N) {
 	}
 }
 
-__global__ void matrix_kernel(int* C, int* A, int* B, int n)
+__global__ void matrix_kernel(int* result, int* A, int* B, int N)
 {
 	int row = blockIdx.y * blockDim.y + threadIdx.y;
 	int col = blockIdx.x * blockDim.x + threadIdx.x;
-	if (row < n && col < n) {
+	if (row < N && col < N) {
 		int sum = 0;
-		for (int k = 0; k < n; k++) {
-			sum += A[row*n+k] * B[k * n + col];
+		for (int n = 0; n < N; n++) {
+			sum += A[row*N+n] * B[n*N + col];
 		}
-		C[row*n+col] = sum;
+		result[row*N+col] = sum;
 	}
 }
 

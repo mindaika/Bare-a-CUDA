@@ -70,7 +70,7 @@ void add_vectors_dev(int *result, int *a, int *b, int n) {
 }
 
 int main(void) {
-     const int CONST_VEC = INT_MAX / 5;
+     const int CONST_VEC = 4;
      // It looks like the crossover is just above this. At 2.6e8, GPU calculation time cuts in half (roughly).
 
      int* a = (int *)malloc(CONST_VEC * sizeof(int));
@@ -82,8 +82,8 @@ int main(void) {
      srand((unsigned)time(0)); 
      
      for(int i=0; i<CONST_VEC; i++){ 
-          a[i] = (rand()%100)+1;
-	     b[i] = (rand()%100)+1;  
+        a[i] = 1;
+	    b[i] = 1;  
      }
      ar = clock() - ar;
      printf ("It took me %ld clicks (%f seconds).\n",ar,((float)ar)/CLOCKS_PER_SEC);
@@ -102,6 +102,18 @@ int main(void) {
      t2 = clock() - t2;
      //print_vector(device_result, CONST_VEC);
      printf ("It took me %ld clicks (%f seconds).\n",t2,((float)t2)/CLOCKS_PER_SEC);
+	
+	for(int i=0; i<CONST_VEC; i++) {
+			printf("%i", device_result[i]);
+			printf("  ");
+	}
+	
+	printf("\n\n");
+	
+	for(int i=0; i<CONST_VEC; i++) {
+			printf("%i",host_result[i]);
+			printf("  ");
+	}
 	
      return 0;
 }
